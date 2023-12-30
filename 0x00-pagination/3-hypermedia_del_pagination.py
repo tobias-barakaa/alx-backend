@@ -42,19 +42,21 @@ class Server:
         Return a dictionary with hypermedia pagination information.
 
         Args:
-            index (int, optional): The current start index of the return page. Default is None.
+            index (int, optional): The current start index of
+            the return page. Default is None.
             page_size (int, optional): The current page size. Default is 10.
 
         Returns:
             Dict: A dictionary containing pagination information.
         """
-        assert index is None or 0 <= index < len(self.__indexed_dataset), "Index out of range."
+        assert index is None or 0 <= index < len(self.__indexed_dataset),
 
         next_index = index + page_size if index is not None else None
 
         data = [
             self.__indexed_dataset[i]
-            for i in range(index, min(index + page_size, len(self.__indexed_dataset)))
+            for i in range(index, min(index + page_size,
+                           len(self.__indexed_dataset)))
         ]
 
         return {
