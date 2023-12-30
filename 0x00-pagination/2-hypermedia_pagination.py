@@ -4,7 +4,7 @@ index_range - functions.
 0x00. Python - Variable Annotations
 """
 import csv
-from typing import List
+from typing import List, Dict, Union
 import math
 
 
@@ -61,29 +61,18 @@ class Server:
         server = Server()
         start, end = index_range(page, page_size)
         return server.get_dataset()[start:end]
-
-    def get_hyper(self, page: int = 1, page_size: int = 10) -> dict:
-        """
-        Return a dictionary containing hypermedia pagination information.
-
-        Args:
-            page (int): The current page number.
-            page_size (int): The number of items per page.
-
-        Returns:
-            dict: A dictionary containing pagination information.
-        """
-        data = self.get_page(page, page_size)
+    
+    def get_hyper(self, page: int = 1, page_size: int = 10) -> Dict[str, Union[int, List[List], None]]:
+        page_data = self.get_page(page, page_size)
         total_pages = math.ceil(len(self.dataset()) / page_size)
 
-        next_page = page + 1 if page < total_pages else None
-        prev_page = page - 1 if page > 1 else None
-
-        return {
-            'page_size': len(data),
-            'page': page,
-            'data': data,
-            'next_page': next_page,
-            'prev_page': prev_page,
-            'total_pages': total_pages
+        hyper_info = {
+            "page_size": len(page_data),
+            "page": page,
+            "data": page_data,
+            "next_page": page + 1 if page < total_pages else None,
+            "prev_page": page - 1 if page > 1 else None,
+            "total_pages": total_pages
         }
+
+        return hyper_info
