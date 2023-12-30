@@ -2,11 +2,12 @@
 """
 index_range - functions.
 0x00. Python - Variable Annotations
-"""   
+"""
 
 import csv
 import math
 from typing import List, Dict, Union
+
 
 def index_range(page, page_size):
     """
@@ -17,6 +18,7 @@ def index_range(page, page_size):
     start_index = (page - 1) * page_size
     end_index = page * page_size
     return start_index, end_index
+
 
 class Server:
     """Server class to paginate a database of popular baby names."""
@@ -37,17 +39,19 @@ class Server:
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
         """
-        Return the appropriate page of the dataset based on the pagination parameters.
+        Return the appropriate page of the dataset based on the
+        pagination parameters.
 
         Args:
             page (int): The current page number.
             page_size (int): The number of items per page.
 
         Returns:
-            List[List]: A list of rows corresponding to the specified page and page_size.
+            List[List]: A list of rows corresponding to the
+        specified page and page_size.
         """
-        assert isinstance(page, int) and page > 0, "Page must be a positive integer."
-        assert isinstance(page_size, int) and page_size > 0, "Page_size must be a positive integer."
+        assert isinstance(page, int) and page > 0
+        assert isinstance(page_size, int) and page_size > 0
 
         start_index, end_index = index_range(page, page_size)
         dataset = self.dataset()
@@ -57,16 +61,19 @@ class Server:
 
         return dataset[start_index:end_index]
 
-    def get_hyper(self, page: int = 1, page_size: int = 10) -> Dict[str, Union[int, List[List], None]]:
+    def get_hyper(self, page: int = 1, page_size: int = 10) -> \
+            Dict[str, Union[int, List[List], None]]:
         """
-        Return a dictionary containing hypermedia pagination information.
+        Return a dictionary containing hypermedia pagination
+        information.
 
         Args:
             page (int): The current page number.
             page_size (int): The number of items per page.
 
         Returns:
-            dict: A dictionary containing pagination information.
+            dict: A dictionary containing pagination
+            information.
         """
         page_data = self.get_page(page, page_size)
         total_pages = math.ceil(len(self.dataset()) / page_size)
