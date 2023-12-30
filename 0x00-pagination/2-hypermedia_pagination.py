@@ -4,8 +4,8 @@ index_range - functions.
 0x00. Python - Variable Annotations
 """
 import csv
-import math
 from typing import List
+import math
 
 
 def index_range(page: int, page_size: int) -> tuple:
@@ -62,18 +62,29 @@ class Server:
         start, end = index_range(page, page_size)
         return server.get_dataset()[start:end]
     
+
     def get_hyper(self, page: int = 1, page_size: int = 10) -> dict:
         """
-        Get hyper.
+        Return a dictionary containing hypermedia pagination information.
+
+        Args:
+            page (int): The current page number.
+            page_size (int): The number of items per page.
+
+        Returns:
+            dict: A dictionary containing pagination information.
         """
-        total_pages = len(self.get_dataset()) / page_size
-        if len(self.get_dataset()) % page_size != 0:
-            total_pages += 1
+        data = self.get_page(page, page_size)
+        total_pages = math.ceil(len(self.dataset()) / page_size)
+
+        next_page = page + 1 if page < total_pages else None
+        prev_page = page - 1 if page > 1 else None
+
         return {
-            "page_size": page_size if page < total_pages else 0,
-            "page": page,
-            "data": self.get_page(page, page_size),
-            "next_page": page + 1 if page + 1 < total_pages else None,
-            "prev_page": page - 1 if page > 1 else None,
-            "total_pages": total_pages
+            'page_size': len(data),
+            'page': page,
+            'data': data,
+            'next_page': next_page,
+            'prev_page': prev_page,
+            'total_pages': total_pages
         }
