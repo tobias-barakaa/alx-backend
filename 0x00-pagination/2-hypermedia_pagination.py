@@ -2,67 +2,72 @@
 """
 index_range - functions.
 0x00. Python - Variable Annotations
-"""
+"""   
+
 import csv
-from typing import List, Dict, Union
 import math
+from typing import List, Dict, Union
 
-
-def index_range(page: int, page_size: int) -> tuple:
+def index_range(page, page_size):
     """
     Return a tuple of size two containing a start index and an end index
-        corresponding to the range of indexes to return in a list for those
-        particular pagination parameters.
+    corresponding to the range of indexes to return in a list for those
+    particular pagination parameters.
     """
-    if page <= 0 or page_size <= 0:
-        raise ValueError("Both page and page_size must be positive integers.")
-    start = (page - 1) * page_size
-    end = page * page_size
-    return (start, end)
-
+    start_index = (page - 1) * page_size
+    end_index = page * page_size
+    return start_index, end_index
 
 class Server:
     """Server class to paginate a database of popular baby names."""
-
-    DATAFILE = "Popular_Baby_Names.csv"
+    DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
-        """
-        Initialize instance.
-        """
         self.__dataset = None
 
-    def dataset(self) -> List[str]:
-        """
-        Dataset getter.
-        """
-        return self.__dataset
-
-    def get_dataset(self) -> List[str]:
-        """
-        Get dataset.
-        """
+    def dataset(self) -> List[List]:
+        """Cached dataset"""
         if self.__dataset is None:
-            with open(self.DATAFILE, "r") as f:
+            with open(self.DATA_FILE) as f:
                 reader = csv.reader(f)
-                dataset = []
-                for row in reader:
-                    dataset.append(row)
+                dataset = [row for row in reader]
             self.__dataset = dataset[1:]
+
         return self.__dataset
 
-    @staticmethod
-    def get_page(page: int = 1, page_size: int = 10) -> List[str]:
+    def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
         """
-        Get page.
+        Return the appropriate page of the dataset based on the pagination parameters.
+
+        Args:
+            page (int): The current page number.
+            page_size (int): The number of items per page.
+
+        Returns:
+            List[List]: A list of rows corresponding to the specified page and page_size.
         """
-        assert isinstance(page, int) and page > 0
-        assert isinstance(page_size, int) and page_size > 0
-        server = Server()
-        start, end = index_range(page, page_size)
-        return server.get_dataset()[start:end]
-    
+        assert isinstance(page, int) and page > 0, "Page must be a positive integer."
+        assert isinstance(page_size, int) and page_size > 0, "Page_size must be a positive integer."
+
+        start_index, end_index = index_range(page, page_size)
+        dataset = self.dataset()
+
+        if start_index >= len(dataset):
+            return []
+
+        return dataset[start_index:end_index]
+
     def get_hyper(self, page: int = 1, page_size: int = 10) -> Dict[str, Union[int, List[List], None]]:
+        """
+        Return a dictionary containing hypermedia pagination information.
+
+        Args:
+            page (int): The current page number.
+            page_size (int): The number of items per page.
+
+        Returns:
+            dict: A dictionary containing pagination information.
+        """
         page_data = self.get_page(page, page_size)
         total_pages = math.ceil(len(self.dataset()) / page_size)
 
