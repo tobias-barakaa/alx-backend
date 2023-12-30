@@ -9,20 +9,8 @@ import math
 from typing import List, Dict, Union
 
 
-def index_range(page, page_size):
-    """
-    Return a tuple of size two containing a start index and an end index
-    corresponding to the range of indexes to return in a list for those
-    particular pagination parameters.
-    """
-    start_index = (page - 1) * page_size
-    end_index = page * page_size
-    return start_index, end_index
-
-
 class Server:
-    """Server class to paginate a database of popular baby names.
-    """
+    """Server class to paginate a database of popular baby names."""
     DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
@@ -30,8 +18,7 @@ class Server:
         self.__indexed_dataset = None
 
     def dataset(self) -> List[List]:
-        """Cached dataset
-        """
+        """Cached dataset"""
         if self.__dataset is None:
             with open(self.DATA_FILE) as f:
                 reader = csv.reader(f)
@@ -41,8 +28,7 @@ class Server:
         return self.__dataset
 
     def indexed_dataset(self) -> Dict[int, List]:
-        """Dataset indexed by sorting position, starting at 0
-        """
+        """Dataset indexed by sorting position, starting at 0"""
         if self.__indexed_dataset is None:
             dataset = self.dataset()
             truncated_dataset = dataset[:1000]
@@ -52,15 +38,28 @@ class Server:
         return self.__indexed_dataset
 
     def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict:
-        assert index is None or (isinstance(index, int) and 0 <= index < len(self.__indexed_dataset)), "Invalid index"
-        assert isinstance(page_size, int) and page_size > 0, "Page size must be a positive integer"
+        """
+        Return a dictionary with hypermedia pagination information.
+
+        Args:
+            index (int, optional): The current start index of the return page. Default is None.
+            page_size (int, optional): The current page size. Default is 10.
+
+        Returns:
+            Dict: A dictionary containing pagination information.
+        """
+        assert index is None or 0 <= index < len(self.__indexed_dataset), "Index out of range."
 
         next_index = index + page_size if index is not None else None
-        data = [self.__indexed_dataset[i] for i in range(index, index + page_size) if i in self.__indexed_dataset]
+
+        data = [
+            self.__indexed_dataset[i]
+            for i in range(index, min(index + page_size, len(self.__indexed_dataset)))
+        ]
 
         return {
             "index": index,
             "next_index": next_index,
-            "page_size": len(data),
-            "data": data
+            "page_size": page_size,
+            "data": data,
         }
