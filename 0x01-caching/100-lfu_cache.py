@@ -26,7 +26,8 @@ class LFUCache(BaseCaching):
 
         if len(self.cache_data) >= BaseCaching.MAX_ITEMS:
             # Find the least frequently used item
-            lfu_items = [k for k, v in self.frequency.items() if v == min(self.frequency.values())]
+            lfu_items = [k for k, v in self.frequency.items()
+                         if v == min(self.frequency.values())]
             lru_item = min(lfu_items, key=lambda k: self.last_used_time[k])
 
             # Discard the least recently used item in case of ties
