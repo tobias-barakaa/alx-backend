@@ -11,10 +11,13 @@ class LFUCache(BaseCaching):
     class LFUCache that inherits from BaseCaching and is a caching system
     """
     def __init__(self):
+        """
+        constructor
+        """
         super().__init__()
         self.queue = []
-        self.frequency = {}
-        
+        self.count = {}
+
     def put(self, key, item):
         """
         Must assign to the dictionary self.cache_data the item value
@@ -22,30 +25,26 @@ class LFUCache(BaseCaching):
         """
         if key and item:
             if len(self.cache_data) >= BaseCaching.MAX_ITEMS:
-                self.evict_least_frequent()
+                if key in self.cache_data:
+                    self.queue.remove(key)
+                else:
+                    del self.cache_data[self.queue[0]]
+                    print("DISCARD:", self.queue[0])
+                    self.queue.pop(0)
             self.cache_data[key] = item
             self.queue.append(key)
-            self.increment_frequency(key)
+            if key in self.count:
+                self.count[key] += 1
+            else:
+                self.count[key] = 1
 
     def get(self, key):
         """
-        check if key exists in self.cache_data
+        Must return the value in self.cache_data linked to key.
         """
         if key in self.cache_data:
-            self.increment_frequency(key)
+            self.queue.remove(key)
+            self.queue.append(key)
+            self.count[key] += 1
             return self.cache_data[key]
         return None
-
-    def evict_least_frequent(self):
-        if self.queue:
-            least_frequent_key = min(self.queue, key=lambda k: self.frequency.get(k, 0))
-            self.queue.remove(least_frequent_key)
-            print("DISCARD:", least_frequent_key)
-            del self.cache_data[least_frequent_key]
-            del self.frequency[least_frequent_key]
-
-    def increment_frequency(self, key):
-        if key in self.frequency:
-            self.frequency[key] += 1
-        else:
-            self.frequency[key] = 1
