@@ -22,17 +22,14 @@ app.config.from_object(Config)
 
 @babel.localeselector
 def get_locale() -> str:
-    """
-    get locale from request or use default behavior.
-    """
-    locale = request.args.get('locale')
-    if locale and locale in app.config['LANGUAGES']:
-        return locale
-    else:
-        return request.accept_languages.best_match(app.config['LANGUAGES'])
+    """get locale"""
+    requested_locale = request.args.get('locale')
+    if requested_locale and requested_locale in app.config['LANGUAGES']:
+        return requested_locale
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
 @app.route('/')
 def index() -> str:
     """index"""
-    return render_template('3-index.html')
+    return render_template('4-index.html')
