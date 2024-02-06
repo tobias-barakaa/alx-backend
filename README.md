@@ -100,7 +100,7 @@ To run your Node.js backend application:
 
 Your backend application should now be up and running, ready to serve requests and interact with the PostgreSQL database.
 
-## Conclusion
+## Finishing
 
 Configuring a Node.js backend with a PostgreSQL database allows you to build powerful web applications with robust data storage and retrieval capabilities. By following this guide, you can set up and configure your backend environment efficiently, paving the way for developing feature-rich applications.
 
