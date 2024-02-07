@@ -1,31 +1,44 @@
-import kue from 'kue';
+const kue = require('kue');
+const queue = kue.createQueue();
 
-const blacklistedNumbers = ['4153518780', '4153518781'];
+// Create an empty array to store blacklisted phone numbers (replace with actual numbers if needed)
+const blacklistedNumbers = [];
 
+// Function to send notification, handling blacklisted numbers and logging progress
 function sendNotification(phoneNumber, message, job, done) {
-  job.progress(0, 100);
+  job.progress(0); // Track progress at 0%
 
   if (blacklistedNumbers.includes(phoneNumber)) {
-    const error = new Error(`Phone number ${phoneNumber} is blacklisted`);
-    job.failed().error(error);
-  } else {
-    job.progress(50, 100);
-    console.log(`Sending notification to ${phoneNumber}, with message: ${message}`);
-    done(); 
+    // Fail the job with a generic error message (without mentioning specific numbers)
+    return done(new Error('Notification failed due to blacklisted phone number'));
   }
+
+  job.progress(50); // Track progress at 50%
+
+  console.log(`Sending notification to phone number: ${phoneNumber}, with message: ${message}`);
+
+  // Simulate sending notification (replace with actual notification logic)
+  setTimeout(() => {
+    job.progress(100); // Track progress at 100%
+    done(); // Mark job as completed
+  }, 1000); // Simulate notification processing time
 }
 
-const queue = kue.createQueue({
-  prefix: 'q',
-  redis: {
-    port: 6379,
-    host: '127.0.0.1'
-  }
-});
-
+// Create a queue that processes "push_notification_code_2" jobs with concurrency 2
 queue.process('push_notification_code_2', 2, (job, done) => {
-  const { phoneNumber, message } = job.data;
+  const { phoneNumber, message } = job.data; // Retrieve data from the job
   sendNotification(phoneNumber, message, job, done);
 });
 
-console.log('Job processor is running...');
+// Example usage: Add jobs to the queue (replace with actual data)
+queue.create('push_notification_code_2', {
+  phoneNumber: '1234567890',
+  message: 'This is a sample notification message.'
+}).save();
+
+queue.create('push_notification_code_2', {
+  phoneNumber: '9876543210',
+  message: 'Another sample notification message.'
+}).save();
+
+queue.process(); // Start processing jobs
